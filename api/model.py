@@ -37,6 +37,21 @@ MODELS = [(BertForSequenceClassification,BertTokenizer,'bert-base-cased'),
 
 
 def train_model(train_df, model_save_path, model_select=0):
+    """
+Trains a sentiment classification model on the provided dataset.
+
+Args:
+- train_df (pd.DataFrame)
+- model_save_path (str)
+- model_select (int, optional)
+
+Returns:
+        str: The path where the best model was saved.
+    
+Notes:
+        - Converts sentiment labels to numeric form (positive=1, negative=2, neutral=0).
+        - Saves the models
+    """
     seed_torch(42)
 
     cur_model = MODELS[model_select]
@@ -150,6 +165,15 @@ def train_model(train_df, model_save_path, model_select=0):
     return model_save_path
 
 def seed_torch(seed):
+    """
+Set random seeds for reproducibility in PyTorch and related libraries. 
+
+Args: 
+- Seed (int) : number to use for all random generators. 
+
+Example:
+seed_torch(42)
+    """
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -157,6 +181,17 @@ def seed_torch(seed):
     torch.backends.cudnn.deterministic=True
 
 def test_model(test_df, model_saved_path, model_select=0):
+  """
+Tests a pre-trained sentiment classification model on a test dataset and evaluates its performance.
+    
+Args:
+- test_df (pd.DataFrame)
+- model_saved_path (str)
+- model_select (int, optional)
+    
+Returns:
+pd.DataFrame: A DataFrame with the original test data and the model's predictions.
+    """
 
   MODELS = [(BertForSequenceClassification,BertTokenizer,'bert-base-cased'),
           (XLNetForSequenceClassification, XLNetTokenizer,'xlnet-base-cased'),
