@@ -26,7 +26,15 @@ BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
 EPOCHS = 4
 WEIGHT_DECAY = 0.01
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# Check if MPS (Metal) is available
+if torch.backends.mps.is_available():
+    device = torch.device("mps")  # Use Apple GPU
+elif torch.cuda.is_available():
+    device = torch.device("cuda")  # For NVIDIA GPUs (rare on macOS)
+else:
+    device = torch.device("cpu")   # Fallback to CPU
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 MODEL_NAMES = ['bert', 'xlnet', 'roberta', 'albert']
 
@@ -51,6 +59,7 @@ def train_model(train_df, model_save_path, model_task, model_tokenizer, model_na
         str: The path where the best model was saved.
     """
     seed_torch(42)
+
 
     train_df['polarity'] = train_df['polarity'].replace({'positive': 1, 'negative': 2, 'neutral': 0})
     
@@ -105,6 +114,8 @@ def train_model(train_df, model_save_path, model_task, model_tokenizer, model_na
     lr_scheduler = get_scheduler(
         name="linear", optimizer=optimizer, num_warmup_steps=0, num_training_steps=num_training_steps
     )
+
+    print(f"Using device: {device}")
 
     print("Starting training...")
     best_f1 = 0
